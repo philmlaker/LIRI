@@ -1,8 +1,13 @@
 var keys = require("./keys.js");
 var request = require("request");
+ var spotify = require('spotify');
 
-input = process.argv[2];
-movieName = process.argv[3];
+var input = process.argv[2];
+var nodeArgs = process.argv;
+var movieName = process.argv[3];
+
+
+
 
 if (input === "my-tweets") {
 
@@ -22,19 +27,13 @@ if (input === "my-tweets") {
         }
     });
 
-}
-
-// movie-this
+};
 
 if (input === "movie-this") {
 
-    if (movieName == "undefined") {
-        console.log("help");
-        return;
-    }
-
-    var queryUrl = "http://www.omdbapi.com/?t=" + movieName + "&y=&plot=short&r=json";
-    request(queryUrl, function(error, response, body) {
+    if (movieName == null) {
+        var queryUrl = "http://www.omdbapi.com/?t=" + "Mr.Nobody" + "&y=&plot=short&r=json";
+        request(queryUrl, function(error, response, body) {
 
             // If the request is successful
             if (!error && response.statusCode === 200) {
@@ -51,14 +50,87 @@ if (input === "movie-this") {
                 console.log("Plot: " + JSON.parse(body).Plot);
                 console.log("Actors: " + JSON.parse(body).Actors);
             };
-            // console.log("Rotten Tomatoes Rating: " + JSON.parse(body).tomatoRating);
-            // console.log("Rottem Tomatoes URL: " + JSON.parse(body).Website);
+        });
+    } else {
+        var queryUrl = "http://www.omdbapi.com/?t=" + movieName + "&y=&plot=short&r=json";
+        request(queryUrl, function(error, response, body) {
 
-    });
+            // If the request is successful
+            if (!error && response.statusCode === 200) {
+
+
+                // Parse the body of the site and recover just the imdbRating
+                // (Note: The syntax below for parsing isn't obvious. Just spend a few moments dissecting it).
+
+                console.log("Title: " + JSON.parse(body).Title);
+                console.log("Year: " + JSON.parse(body).Year);
+                console.log("Rating: " + JSON.parse(body).Rated);
+                console.log("Country: " + JSON.parse(body).Country);
+                console.log("Language: " + JSON.parse(body).Language);
+                console.log("Plot: " + JSON.parse(body).Plot);
+                console.log("Actors: " + JSON.parse(body).Actors);
+            };
+        });
+    }
+};
+
+
+if (input === "spotify-this-song") {
+
+    if( process.argv[3] == null){
+    var songName = "The Sign Ace of Base";
+    spotify.search({ type: 'track', query: songName }, function(err, data) {
+
+    if ( err ) {
+        console.log('Error occurred: ' + err);
+        return;
+    }
+    // var data = JSON.stringify(data);
+    console.log("Artist's Name: " + data.tracks.items[0].artists[0].name); 
+    console.log("Song Name: " + data.tracks.items[0].name); 
+    console.log("Preview Link: " + data.tracks.items[0].preview_url); 
+    console.log("Album Name: " + data.tracks.items[0].album.name); 
+});
 
 
 
-}
 
-// spotify-this-son
-// do-what-it-says
+
+
+
+    } else {
+
+    var spotify = require('spotify');
+    song = process.argv[3];
+
+    for (var i = 3; i < nodeArgs.length; i++) {
+
+        if (i > 3 && i < nodeArgs.length) {
+
+            song = song + "+" + nodeArgs[i];
+
+        } else {
+
+
+
+        }
+
+    }
+
+    
+   var songName = song;
+    spotify.search({ type: 'track', query: songName }, function(err, data) {
+
+    if ( err ) {
+        console.log('Error occurred: ' + err);
+        return;
+    }
+    // var data = JSON.stringify(data);
+    console.log("Artist's Name: " + data.tracks.items[0].artists[0].name); 
+    console.log("Song Name: " + data.tracks.items[0].name); 
+    console.log("Preview Link: " + data.tracks.items[0].preview_url); 
+    console.log("Album Name: " + data.tracks.items[0].album.name); 
+});
+
+};
+};
